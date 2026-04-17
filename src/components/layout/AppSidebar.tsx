@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, CalendarDays, ListTodo, Globe, ShieldCheck,
-  BarChart3, ChevronLeft, ChevronRight, Zap, CreditCard, Users, Wallet, UserCog, PlayCircle
+  BarChart3, ChevronLeft, ChevronRight, Zap, CreditCard, Users, Wallet, UserCog, PlayCircle,
+  ChartNoAxesCombined
 } from "lucide-react";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 
@@ -14,9 +15,9 @@ export const AppSidebar = () => {
   const navItems = [
     { path: "/", label: "Dashboard", icon: LayoutDashboard, roles: ['ADMIN', 'OPERADOR'] },
     { path: "/me", label: "Meu Extrato", icon: Wallet, roles: ['OPERADOR'] },
-    { path: "/operators", label: "Recursos Humanos", icon: Users, roles: ['ADMIN'] },
-    { path: "/production", label: "Produção", icon: CalendarDays, roles: ['ADMIN', 'OPERADOR'] },
-    { path: "/tasks", label: "Tarefas", icon: ListTodo, roles: ['ADMIN', 'OPERADOR'] },
+    { path: "/operators", label: "Gestão de Operadores", icon: Users, roles: ['ADMIN'] },
+    { path: "/production", label: "Tarefas", icon: CalendarDays, roles: ['ADMIN', 'OPERADOR'] },
+    { path: "/tasks", label: "Planilhas", icon: ChartNoAxesCombined, roles: ['ADMIN', 'OPERADOR'] },
     { path: "/networks", label: "Redes", icon: Globe, roles: ['ADMIN'] },
     { path: "/pix", label: "Chaves PIX", icon: CreditCard, roles: ['ADMIN', 'OPERADOR'] },
     { path: "/quality", label: "Qualidade", icon: ShieldCheck, roles: ['ADMIN'] },
