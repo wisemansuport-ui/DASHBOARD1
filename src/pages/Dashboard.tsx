@@ -56,7 +56,7 @@ const Dashboard = () => {
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <KPICard title="Receita Mês" value="R$ 84.230" change="+12.5% vs anterior" changeType="positive" icon={DollarSign} color="success" />
       <KPICard title="Metas Atingidas" value="23/28" change="82% de fechamento" changeType="positive" icon={Target} color="primary" />
-      <KPICard title="Links em Andamento" value="5" change="Operadores em metas ativas" changeType="warning" icon={Activity} color="warning" />
+      <KPICard title="Links em Andamento" value="5" change="Operadores em metas ativas" changeType="neutral" icon={Activity} color="warning" />
       <KPICard title="Operadores Online" value="18" change="Turno da Tarde" changeType="neutral" icon={Users} color="primary" />
     </div>
 
