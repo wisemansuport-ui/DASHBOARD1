@@ -9,10 +9,13 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import Index from "./pages/Index";
 import Production from "./pages/Production";
 import Tasks from "./pages/Tasks";
-import Inventory from "./pages/Inventory";
+import Networks from "./pages/Networks";
+import PixKeys from "./pages/PixKeys";
 import Quality from "./pages/Quality";
-import Maintenance from "./pages/Maintenance";
 import Reports from "./pages/Reports";
+import Operators from "./pages/Operators";
+import OperatorExtract from "./pages/OperatorExtract";
+import Tutorial from "./pages/Tutorial";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,10 +33,13 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/production" element={<Production />} />
                 <Route path="/tasks" element={<Tasks />} />
-                <Route path="/inventory" element={<Inventory />} />
+                <Route path="/networks" element={<Networks />} />
+                <Route path="/pix" element={<PixKeys />} />
                 <Route path="/quality" element={<Quality />} />
-                <Route path="/maintenance" element={<Maintenance />} />
                 <Route path="/reports" element={<Reports />} />
+                <Route path="/operators" element={<Operators />} />
+                <Route path="/me" element={<OperatorExtract />} />
+                <Route path="/tutorial" element={<Tutorial />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </AppLayout>
