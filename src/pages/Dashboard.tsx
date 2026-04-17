@@ -1,5 +1,5 @@
 import { KPICard } from "@/components/dashboard/KPICard";
-import { DollarSign, Target, Activity, Users, CalendarDays, ListTodo, ShieldCheck, Wrench, BarChart3 } from "lucide-react";
+import { DollarSign, Target, Activity, Users, CalendarDays, ListTodo, ShieldCheck, Wrench, BarChart3, Globe, ChartNoAxesCombined } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell } from "recharts";
 import { Link } from "react-router-dom";
 import { useLocalStorage } from "../hooks/useLocalStorage";
@@ -30,9 +30,9 @@ const pieData = [
 const pieColors = ["hsl(var(--primary))", "hsl(var(--primary) / 0.4)", "hsl(var(--muted))"];
 
 const quickLinks = [
-  { path: "/production", label: "Produção", icon: CalendarDays, desc: "Cronograma", roles: ['ADMIN', 'OPERADOR'] },
-  { path: "/tasks", label: "Tarefas", icon: ListTodo, desc: "Gestão", roles: ['ADMIN', 'OPERADOR'] },
-  { path: "/networks", label: "Redes", icon: Activity, desc: "Performance", roles: ['ADMIN'] },
+  { path: "/production", label: "Planilhas", icon: ChartNoAxesCombined, desc: "Cronograma", roles: ['ADMIN', 'OPERADOR'] },
+  { path: "/tasks", label: "Tarefas", icon: CalendarDays, desc: "Gestão", roles: ['ADMIN', 'OPERADOR'] },
+  { path: "/networks", label: "Redes", icon: Globe, desc: "Performance", roles: ['ADMIN'] },
   { path: "/quality", label: "Qualidade", icon: ShieldCheck, desc: "Auditoria", roles: ['ADMIN'] },
   { path: "/reports", label: "Relatórios", icon: BarChart3, desc: "Avançado", roles: ['ADMIN'] },
 ];
@@ -56,7 +56,7 @@ const Dashboard = () => {
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <KPICard title="Receita Mês" value="R$ 84.230" change="+12.5% vs anterior" changeType="positive" icon={DollarSign} color="success" />
       <KPICard title="Metas Atingidas" value="23/28" change="82% de fechamento" changeType="positive" icon={Target} color="primary" />
-      <KPICard title="Links em Andamento" value="5" change="Operadores em metas ativas" changeType="warning" icon={Activity} color="warning" />
+      <KPICard title="Links em Andamento" value="5" change="Operadores em metas ativas" changeType="neutral" icon={Activity} color="warning" />
       <KPICard title="Operadores Online" value="18" change="Turno da Tarde" changeType="neutral" icon={Users} color="primary" />
     </div>
 
