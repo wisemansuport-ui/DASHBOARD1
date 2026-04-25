@@ -56,7 +56,7 @@ const Dashboard = () => {
     });
 
     const lucroBruto = totalSacado - totalDepositado;
-    const receitaMensal = lucroBruto - totalSalarios;
+    const receitaMensal = lucroBruto + totalSalarios;
 
     return {
       totalDepositado,
@@ -96,7 +96,7 @@ const Dashboard = () => {
     </div>
 
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <KPICard title="Receita Mês Líquida" value={formatBRL(stats.receitaMensal)} change={`- ${formatBRL(stats.totalSalarios)} salários`} changeType={stats.receitaMensal >= 0 ? "positive" : "negative"} icon={DollarSign} color="success" />
+      <KPICard title="Receita Mês Líquida" value={formatBRL(stats.receitaMensal)} change={`+ ${formatBRL(stats.totalSalarios)} comissões`} changeType="positive" icon={DollarSign} color="success" />
       <KPICard title="Metas Fechadas" value={`${stats.metasFechadas}/${stats.totalMetas}`} change="Registradas" changeType="positive" icon={Target} color="primary" />
       <KPICard title="Metas Ativas" value={stats.metasAtivas} change="Painel de controle" changeType="neutral" icon={Activity} color="warning" />
       <KPICard title="Contas Operadas" value={stats.contasProcessadas} change="Volume total" changeType="neutral" icon={Users} color="primary" />
@@ -201,8 +201,8 @@ const Dashboard = () => {
                <span className={`text-2xl font-black drop-shadow-md ${stats.lucroBruto >= 0 ? 'text-emerald-400' : 'text-red-500'}`}>{formatBRL(stats.lucroBruto)}</span>
              </div>
              <div className="flex flex-col gap-1">
-               <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Custo Operador</span>
-               <span className="text-2xl font-black text-red-400 drop-shadow-md">- {formatBRL(stats.totalSalarios)}</span>
+               <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Ganho Fixo</span>
+               <span className="text-2xl font-black text-emerald-400 drop-shadow-md">+ {formatBRL(stats.totalSalarios)}</span>
              </div>
            </div>
         </div>

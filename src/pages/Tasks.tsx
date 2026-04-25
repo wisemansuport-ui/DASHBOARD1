@@ -53,7 +53,7 @@ const MetaInterior = ({ meta, onBack, onUpdateMeta }: { meta: OperationMeta, onB
   const depositoTotal = remessas.reduce((acc, r) => acc + r.deposito, 0);
   const saqueTotal = remessas.reduce((acc, r) => acc + r.saque, 0);
   const resultadoBruto = saqueTotal - depositoTotal;
-  const resultadoLiquido = resultadoBruto - (meta.salarioOperador || 0);
+  const resultadoLiquido = resultadoBruto + (meta.salarioOperador || 0);
   const lucroAcumulado = remessas.reduce((acc, r) => r.saque > r.deposito ? acc + (r.saque - r.deposito) : acc, 0);
   const prejuizoAcumulado = remessas.reduce((acc, r) => r.deposito > r.saque ? acc + (r.deposito - r.saque) : acc, 0);
   const remessasPositivas = remessas.filter(r => r.saque > r.deposito).length;
@@ -543,7 +543,7 @@ const Tasks = () => {
             const rem = meta.remessas || [];
             const lucroBruto = rem.reduce((acc, r) => acc + (r.saque - r.deposito), 0);
             const salario = meta.salarioOperador || 0;
-            const lucroLiquido = lucroBruto - salario;
+            const lucroLiquido = lucroBruto + salario;
             return (
               <div key={meta.id} className="glass-card rounded-xl border border-border/40 p-4 flex items-center justify-between gap-3 hover:border-primary/30 transition-colors">
                 <div className="flex items-center gap-3 min-w-0 flex-1" onClick={() => setSelectedMetaId(meta.id)}>
@@ -563,7 +563,7 @@ const Tasks = () => {
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className="text-[9px] font-bold text-muted-foreground/50">Bruto: R$ {lucroBruto.toFixed(0)}</span>
                       {salario > 0 && (
-                        <span className="text-[9px] font-bold text-red-500/70">Sal: -{salario.toFixed(0)}</span>
+                        <span className="text-[9px] font-bold text-emerald-500/70">Comissão: +{salario.toFixed(0)}</span>
                       )}
                     </div>
                   </div>
