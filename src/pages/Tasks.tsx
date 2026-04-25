@@ -487,98 +487,119 @@ const Tasks = () => {
       )}
 
       {displayList.length === 0 ? (
-        <div className="glass-card mt-8 flex flex-col items-center justify-center p-20 rounded-3xl border border-dashed border-border/60 text-center relative overflow-hidden group">
-           <p className="text-xl font-extrabold text-foreground">{emptyMsg}</p>
+        <div className="mt-6 glass-card flex flex-col items-center justify-center p-12 rounded-2xl border border-dashed border-border/60 text-center">
+           <p className="text-base font-bold text-muted-foreground">{emptyMsg}</p>
         </div>
       ) : (
-        <div className="mt-8 glass-card rounded-2xl border-border/40 overflow-hidden hide-scrollbar overflow-x-auto">
-          <div className="p-4 border-b border-border/30 flex justify-between items-center bg-muted/10">
-            <h3 className="font-bold text-foreground">Planilha de {activeTab}</h3>
-            ...
-          </div>
-          <table className="w-full text-sm text-left min-w-[800px]">
-             <thead className="text-[10px] uppercase font-bold text-muted-foreground bg-muted/5 border-b border-border/40">
-                <tr><th className="px-6 py-4">Status/Título</th><th className="px-6 py-4">Plataforma/Rede</th><th className="px-6 py-4 text-center">Modelo</th><th className="px-6 py-4 text-center">Contas</th><th className="px-6 py-4 text-right">Resultado</th><th className="px-6 py-4">Ações</th></tr>
-             </thead>
-             <tbody className="divide-y divide-border/20">
-               {renderTableBody()}
-             </tbody>
-          </table>
+        <div className="mt-4 space-y-3">
+          {displayList.map(meta => {
+            const rem = meta.remessas || [];
+            const lucro = rem.reduce((acc, r) => acc + (r.saque - r.deposito), 0);
+            const isNeg = lucro < 0;
+            return (
+              <div key={meta.id} className="glass-card rounded-xl border border-border/40 p-4 flex items-center justify-between gap-3 hover:border-primary/30 transition-colors">
+                <div className="flex items-center gap-3 min-w-0 flex-1" onClick={() => setSelectedMetaId(meta.id)}>
+                  <div className={`w-2 h-2 rounded-full shrink-0 ${meta.status === 'fechada' ? 'bg-primary' : meta.status === 'lixeira' ? 'bg-red-500' : 'bg-emerald-500'}`} />
+                  <div className="min-w-0">
+                    <p className="font-bold text-foreground text-sm truncate">{meta.titulo}</p>
+                    <p className="text-[10px] text-muted-foreground">{meta.plataforma} · {meta.rede} · {meta.contas} contas</p>
+                    <p className="text-[10px] text-muted-foreground">{rem.length} remessa(s) · {meta.modelo}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <p className={`text-sm font-black ${isNeg ? 'text-red-500' : 'text-emerald-400'}`}>
+                    {rem.length > 0 ? `${isNeg ? '' : '+'}R$ ${lucro.toFixed(2).replace('.', ',')}` : `~R$ ${(meta.contas * 2.5).toFixed(0)}`}
+                  </p>
+                  {activeTab === 'Lixeira' ? (
+                    <>
+                      <button onClick={() => onRestoreMeta(meta.id)} className="p-2 rounded-lg bg-muted/20 text-muted-foreground hover:text-emerald-400 transition-colors"><RotateCcw className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => onPermDelete(meta.id)} className="p-2 rounded-lg bg-muted/20 text-muted-foreground hover:text-red-400 transition-colors"><X className="w-3.5 h-3.5" /></button>
+                    </>
+                  ) : (
+                    <>
+                      <button onClick={() => setSelectedMetaId(meta.id)} className="p-2 rounded-lg bg-muted/20 text-muted-foreground hover:text-primary transition-colors"><ArrowUpRight className="w-3.5 h-3.5" /></button>
+                      {activeTab !== 'Visao geral' && <button onClick={() => onTrashMeta(meta.id)} className="p-2 rounded-lg bg-muted/20 text-muted-foreground hover:text-red-400 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>}
+                    </>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
 
-      {/* Modal ... omitted here as it's the exact same logic. wait, I have to include it to not break the page */}
-       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-background/80 backdrop-blur-sm animate-fade-in">
-          <div className="glass-card border border-primary/20 w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl shadow-[0_0_40px_hsl(var(--primary)/0.1)] relative overflow-hidden max-h-[90vh] overflow-y-auto">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-accent" />
-            <div className="flex items-start justify-between p-6 border-b border-border/40">
+        {/* MODAL - Nova Operação (Bottom Sheet) */}
+      {isModalOpen && (
+        <div
+          className="fixed inset-0 flex items-end justify-center bg-black/70 backdrop-blur-sm animate-fade-in"
+          style={{ zIndex: 9999 }}
+          onClick={(e) => { if (e.target === e.currentTarget) setIsModalOpen(false); }}
+        >
+          <div className="bg-card border border-border rounded-t-2xl w-full max-h-[88vh] overflow-y-auto shadow-2xl">
+            <div className="sticky top-0 bg-card border-b border-border/40 px-5 py-4 flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-extrabold tracking-tight text-foreground">Nova operacao</h2>
-                <p className="text-sm text-muted-foreground mt-1">Configure e inicie sua meta</p>
+                <h2 className="text-lg font-extrabold text-foreground">Nova operação</h2>
+                <p className="text-xs text-muted-foreground">Configure e inicie sua meta</p>
               </div>
-              <button 
-                onClick={() => setIsModalOpen(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-              >
+              <button onClick={() => setIsModalOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-muted text-muted-foreground">
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleCreate} className="p-6 space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
+            <form onSubmit={handleCreate} className="p-5 space-y-5">
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
                   <label className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase">Plataforma *</label>
-                  <input type="text" value={plataforma} onChange={e => setPlataforma(e.target.value)} placeholder="Ex. Scorpionpg" className="w-full bg-background border border-border/50 rounded-lg px-4 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-inner" required />
+                  <input type="text" value={plataforma} onChange={e => setPlataforma(e.target.value)} placeholder="Ex. Scorpionpg" className="w-full bg-background border border-border/60 rounded-lg px-3 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary" required />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   <label className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase">Rede *</label>
-                  <select value={rede} onChange={e => setRede(e.target.value)} className="w-full bg-background border border-border/50 rounded-lg px-4 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-inner appearance-none" required>
+                  <select value={rede} onChange={e => setRede(e.target.value)} className="w-full bg-background border border-border/60 rounded-lg px-3 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary" required>
                     {redes.map(r => <option key={r} value={r}>{r}</option>)}
                   </select>
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase">Titulo *</label>
-                  <input type="text" value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Ex. Media 80 3,5x" className="w-full bg-background border border-border/50 rounded-lg px-4 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-inner" required />
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase">Título *</label>
+                <input type="text" value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Ex. Media 80 3,5x" className="w-full bg-background border border-border/60 rounded-lg px-3 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary" required />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase">Contas *</label>
+                  <input type="number" value={contas} onChange={e => setContas(e.target.value ? Number(e.target.value) : '')} placeholder="Ex. 70" className="w-full bg-background border border-border/60 rounded-lg px-3 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary font-bold" min="1" required />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase">Contas</label>
-                  <input type="number" value={contas} onChange={e => setContas(e.target.value ? Number(e.target.value) : '')} placeholder="Ex. 70" className="w-full bg-background border border-border/50 rounded-lg px-4 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-inner font-bold" min="1" required />
-                </div>
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   <label className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase">Total AP.V</label>
-                  <input type="number" value={totalApv} onChange={e => setTotalApv(e.target.value ? Number(e.target.value) : '')} placeholder="Ex. 20.000" className="w-full bg-background border border-border/50 rounded-lg px-4 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-inner font-bold" min="0" />
+                  <input type="number" value={totalApv} onChange={e => setTotalApv(e.target.value ? Number(e.target.value) : '')} placeholder="Ex. 20.000" className="w-full bg-background border border-border/60 rounded-lg px-3 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary" min="0" />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase">Selecao Rapida</label>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase">Seleção Rápida de Contas</label>
                 <div className="grid grid-cols-4 gap-2">
                   {[20, 30, 50, 60].map(val => (
-                    <button key={val} type="button" onClick={() => setContas(val)} className={`py-2 rounded-lg text-sm font-bold transition-all border ${contas === val ? 'bg-primary/20 border-primary text-primary shadow-[0_0_15px_hsl(var(--primary)/0.2)]' : 'bg-muted/30 border-border/50 text-muted-foreground hover:bg-muted/50 hover:text-foreground'}`}>
-                      {val}
-                    </button>
+                    <button key={val} type="button" onClick={() => setContas(val)} className={`py-2.5 rounded-lg text-sm font-bold transition-all border ${contas === val ? 'bg-primary/20 border-primary text-primary' : 'bg-muted/30 border-border/50 text-muted-foreground'}`}>{val}</button>
                   ))}
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase">Modelo da Meta</label>
                 <div className="grid grid-cols-2 gap-2">
-                  {['Depositante', 'Recarga'].map((mod: any) => (
-                    <button key={mod} type="button" onClick={() => setModelo(mod)} className={`py-3 rounded-lg text-sm font-bold transition-all border ${modelo === mod ? 'bg-primary/10 border-primary text-primary shadow-[0_0_15px_hsl(var(--primary)/0.15)]' : 'bg-muted/30 border-border/50 text-muted-foreground hover:bg-muted/50 hover:text-foreground'}`}>
-                      {mod}
-                    </button>
+                  {(['Depositante', 'Recarga'] as const).map(mod => (
+                    <button key={mod} type="button" onClick={() => setModelo(mod)} className={`py-3 rounded-lg text-sm font-bold transition-all border ${modelo === mod ? 'bg-primary/10 border-primary text-primary' : 'bg-muted/30 border-border/50 text-muted-foreground'}`}>{mod}</button>
                   ))}
                 </div>
               </div>
 
-              <button type="submit" disabled={!plataforma || rede === 'Selecione' || !titulo || !contas} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-extrabold py-4 rounded-xl flex items-center justify-center gap-2 transition-transform hover:scale-[1.02] shadow-[0_10px_30px_hsl(var(--primary)/0.3)] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed">
-                <Target className="w-5 h-5" /> Iniciar operacao
+              <button type="submit" disabled={!plataforma || rede === 'Selecione' || !titulo || !contas} className="w-full bg-primary text-primary-foreground font-extrabold py-4 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50">
+                <Target className="w-5 h-5" /> Iniciar operação
               </button>
+
+              <div className="h-6" />
             </form>
           </div>
         </div>
