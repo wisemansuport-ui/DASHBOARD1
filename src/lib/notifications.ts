@@ -19,7 +19,7 @@ export const requestNotificationPermission = async () => {
 // NOTE: For sending pushes via REST API from the frontend, we need the REST API Key.
 // This is not standard for public facing apps, but works for internal admin tools.
 const ONESIGNAL_APP_ID = "25bd74d4-9b56-4021-bbb4-3260a00197f4";
-const ONESIGNAL_REST_API_KEY = "SUA_REST_API_KEY_AQUI"; // <-- COLOQUE SUA REST API KEY AQUI
+const ONESIGNAL_REST_API_KEY = "os_v2_app_ew6xibeykzacdo5ugjqkaamx6qebrcmofnfu2cus3n3a7o2xmzdxs2gz5ugywhac573yzcvzj5ccwqb4xu5ox6jwfoebizoytmn75pa";
 
 export const pushNotify = async (title: string, body: string) => {
   // 1. Local HTML5 Notification fallback (for the operator if they have permissions)
