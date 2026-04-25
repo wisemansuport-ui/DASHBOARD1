@@ -60,25 +60,43 @@ export const TopBar = () => {
                 <div className="flex flex-col gap-1">
                   <span className="text-sm font-semibold text-foreground">Notificações</span>
                   <button 
-                    onClick={async () => {
-                      try {
-                        const OneSignal = (await import("react-onesignal")).default;
-                        // v3 SDK API: request permission and subscribe
-                        await OneSignal.Notifications.requestPermission();
-                        const isSubscribed = OneSignal.User.PushSubscription.optedIn;
-                        if (isSubscribed) {
-                          alert("✅ Alertas ativados com sucesso! Você receberá notificações mesmo com o app fechado.");
-                        }
-                      } catch (e) {
-                        console.error("Erro ao ativar alertas:", e);
-                        // Fallback: use native browser API
-                        if ("Notification" in window) {
-                          const result = await Notification.requestPermission();
-                          if (result === "granted") {
-                            new Notification("✅ Alertas Ativados!", { body: "Você receberá notificações do NytzerVision." });
-                          }
-                        }
+                    onClick={() => {
+                      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+                      const isPWA = window.matchMedia("(display-mode: standalone)").matches || (window.navigator as any).standalone === true;
+
+                      // iOS Safari: only works as installed PWA
+                      if (isIOS && !isPWA) {
+                        alert("📲 Para ativar alertas no iPhone:\n\n1. Toque em Compartilhar ↗\n2. Toque em \"Adicionar à Tela de Início\"\n3. Abra o app pelo ícone criado\n4. Volte aqui e clique em Ativar Alertas");
+                        return;
                       }
+
+                      // Standard Web Push (Chrome, Firefox, PWA no iOS 16.4+)
+                      if (!("Notification" in window)) {
+                        alert("Seu navegador não suporta notificações push.");
+                        return;
+                      }
+
+                      if (Notification.permission === "granted") {
+                        alert("✅ Alertas já estão ativos neste dispositivo!");
+                        return;
+                      }
+
+                      if (Notification.permission === "denied") {
+                        alert("❌ Notificações bloqueadas. Vá em Configurações do navegador → Notificações e permita este site.");
+                        return;
+                      }
+
+                      // This must be synchronous from a user gesture
+                      Notification.requestPermission().then((result) => {
+                        if (result === "granted") {
+                          new Notification("✅ NytzerVision Alertas Ativados!", {
+                            body: "Você vai receber alertas de remessas e operações.",
+                            icon: "/favicon.ico"
+                          });
+                        } else {
+                          alert("Permissão negada. Ative nas configurações do seu navegador.");
+                        }
+                      });
                     }} 
                     className="text-[10px] font-bold text-primary flex items-center gap-1 hover:underline"
                   >
