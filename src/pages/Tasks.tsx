@@ -527,8 +527,9 @@ const Tasks = () => {
         <div className="mt-4 space-y-3">
           {displayList.map(meta => {
             const rem = meta.remessas || [];
-            const lucro = rem.reduce((acc, r) => acc + (r.saque - r.deposito), 0);
-            const isNeg = lucro < 0;
+            const lucroBruto = rem.reduce((acc, r) => acc + (r.saque - r.deposito), 0);
+            const salario = meta.salarioOperador || 0;
+            const lucroLiquido = lucroBruto - salario;
             return (
               <div key={meta.id} className="glass-card rounded-xl border border-border/40 p-4 flex items-center justify-between gap-3 hover:border-primary/30 transition-colors">
                 <div className="flex items-center gap-3 min-w-0 flex-1" onClick={() => setSelectedMetaId(meta.id)}>
@@ -539,10 +540,19 @@ const Tasks = () => {
                     <p className="text-[10px] text-muted-foreground">{rem.length} remessa(s) · {meta.modelo}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <p className={`text-sm font-black ${isNeg ? 'text-red-500' : 'text-emerald-400'}`}>
-                    {rem.length > 0 ? `${isNeg ? '' : '+'}R$ ${lucro.toFixed(2).replace('.', ',')}` : `~R$ ${(meta.contas * 2.5).toFixed(0)}`}
-                  </p>
+                <div className="flex items-center gap-4 shrink-0 text-right">
+                  <div className="flex flex-col items-end">
+                    <p className={`text-[13px] font-black tracking-tight ${lucroLiquido >= 0 ? 'text-primary' : 'text-red-500'}`}>
+                      {lucroLiquido > 0 ? '+' : ''}R$ {lucroLiquido.toFixed(2).replace('.', ',')}
+                      <span className="text-[10px] ml-1 opacity-60 uppercase font-black tracking-tighter">Líq</span>
+                    </p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-[9px] font-bold text-muted-foreground/50">Bruto: R$ {lucroBruto.toFixed(0)}</span>
+                      {salario > 0 && (
+                        <span className="text-[9px] font-bold text-red-500/70">Sal: -{salario.toFixed(0)}</span>
+                      )}
+                    </div>
+                  </div>
                   {activeTab === 'Lixeira' ? (
                     <>
                       <button onClick={() => onRestoreMeta(meta.id)} className="p-2 rounded-lg bg-muted/20 text-muted-foreground hover:text-emerald-400 transition-colors"><RotateCcw className="w-3.5 h-3.5" /></button>
