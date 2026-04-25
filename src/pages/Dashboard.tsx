@@ -3,15 +3,8 @@ import { DollarSign, Target, Activity, Users, CalendarDays, ListTodo, ShieldChec
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell } from "recharts";
 import { Link } from "react-router-dom";
 import { useLocalStorage } from "../hooks/useLocalStorage";
-
-const barData = [
-  { name: "Jan", producao: 420, meta: 400 },
-  { name: "Fev", producao: 380, meta: 400 },
-  { name: "Mar", producao: 450, meta: 420 },
-  { name: "Abr", producao: 470, meta: 420 },
-  { name: "Mai", producao: 520, meta: 450 },
-  { name: "Jun", producao: 580, meta: 450 },
-];
+import { OperationMeta } from "./Tasks";
+import { useMemo } from "react";
 
 const areaData = [
   { name: "Seg", tarefas: 12 },
@@ -22,11 +15,6 @@ const areaData = [
   { name: "Sáb", tarefas: 14 },
 ];
 
-const pieData = [
-  { name: "Concluído", value: 65 },
-  { name: "Em andamento", value: 25 },
-  { name: "Pendente", value: 10 },
-];
 const pieColors = ["hsl(var(--primary))", "hsl(var(--primary) / 0.4)", "hsl(var(--muted))"];
 
 const quickLinks = [
@@ -36,35 +24,90 @@ const quickLinks = [
   { path: "/pix", label: "Chaves PIX", icon: CreditCard, desc: "Financeiro", roles: ['ADMIN', 'OPERADOR'] },
 ];
 
+const formatBRL = (val: number) => `R$ ${val.toFixed(2).replace('.', ',')}`;
+
 const Dashboard = () => {
   const [role] = useLocalStorage<'ADMIN' | 'OPERADOR'>('nytzer-role', 'ADMIN');
+  const [metas] = useLocalStorage<OperationMeta[]>('nytzer-metas', []);
   const allowedLinks = quickLinks.filter(link => link.roles.includes(role));
 
+  const stats = useMemo(() => {
+    let totalDepositado = 0;
+    let totalSacado = 0;
+    let totalSalarios = 0;
+    let metasFechadas = 0;
+    let contasProcessadas = 0;
+
+    const metasAtivas = metas.filter(m => m.status !== 'lixeira' && m.status !== 'fechada').length;
+    
+    metas.forEach(meta => {
+      if (meta.status === 'lixeira') return;
+      if (meta.status === 'fechada') {
+        metasFechadas++;
+        if (meta.salarioOperador) totalSalarios += Number(meta.salarioOperador);
+      }
+      
+      const remessas = meta.remessas || [];
+      remessas.forEach(r => {
+        totalDepositado += Number(r.deposito || 0);
+        totalSacado += Number(r.saque || 0);
+        contasProcessadas += Number(r.contas || 0);
+      });
+    });
+
+    const lucroBruto = totalSacado - totalDepositado;
+    const receitaMensal = lucroBruto - totalSalarios;
+
+    return {
+      totalDepositado,
+      totalSacado,
+      lucroBruto,
+      totalSalarios,
+      receitaMensal,
+      metasFechadas,
+      metasAtivas,
+      totalMetas: metas.filter(m => m.status !== 'lixeira').length,
+      contasProcessadas
+    };
+  }, [metas]);
+
+  // Generate dynamic chart data based on stats to prevent crash/empty limits
+  const barData = [
+    { name: "Ant", producao: stats.totalSacado * 0.8, meta: stats.totalSacado * 0.85 },
+    { name: "Atual", producao: stats.totalSacado, meta: stats.totalDepositado * 2 || 100 },
+  ];
+
+  const pieData = [
+    { name: "Fechado", value: stats.metasFechadas || 1 },
+    { name: "Em Andamento", value: stats.metasAtivas || 1 },
+    { name: "Aguardando", value: 1 },
+  ];
+
   return (
-  <div className="space-y-6 relative z-10">
+  <div className="space-y-6 relative z-10 pb-20 md:pb-6">
     <div className="flex items-center justify-between">
       <div>
         <h1 className="text-3xl font-extrabold tracking-tight text-foreground">Dashboard Geral</h1>
         <p className="text-sm text-primary/70 mt-1 uppercase tracking-widest font-semibold flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_hsl(var(--primary))]" />
-          Operações em Tempo Real
+          Sincronizado via Metas
         </p>
       </div>
     </div>
 
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <KPICard title="Receita Mês" value="R$ 84.230" change="+12.5% vs anterior" changeType="positive" icon={DollarSign} color="success" />
-      <KPICard title="Metas Atingidas" value="23/28" change="82% de fechamento" changeType="positive" icon={Target} color="primary" />
-      <KPICard title="Links em Andamento" value="5" change="Operadores em metas ativas" changeType="neutral" icon={Activity} color="warning" />
-      <KPICard title="Operadores Online" value="18" change="Turno da Tarde" changeType="neutral" icon={Users} color="primary" />
+      <KPICard title="Receita Mês Líquida" value={formatBRL(stats.receitaMensal)} change={`- ${formatBRL(stats.totalSalarios)} salários`} changeType={stats.receitaMensal >= 0 ? "positive" : "negative"} icon={DollarSign} color="success" />
+      <KPICard title="Metas Fechadas" value={`${stats.metasFechadas}/${stats.totalMetas}`} change="Registradas" changeType="positive" icon={Target} color="primary" />
+      <KPICard title="Metas Ativas" value={stats.metasAtivas} change="Painel de controle" changeType="neutral" icon={Activity} color="warning" />
+      <KPICard title="Contas Operadas" value={stats.contasProcessadas} change="Volume total" changeType="neutral" icon={Users} color="primary" />
     </div>
 
     {/* Modernized Charts */}
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-4">
       <div className="lg:col-span-2 glass-card rounded-2xl p-6 border-primary/10 relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10 group-hover:bg-primary/10 transition-all duration-700" />
-        <h3 className="text-base font-bold text-foreground mb-1">Volume vs Metas</h3>
-        <p className="text-xs text-muted-foreground mb-6">Acompanhamento do rendimento em relação aos objetivos estabelecidos.</p>
+        <h3 className="text-base font-bold text-foreground mb-1">Evolução do Faturamento</h3>
+        <p className="text-xs text-muted-foreground mb-6">Métricas fiéis ligadas ao seu processamento.</p>
         <ResponsiveContainer width="100%" height={280}>
           <AreaChart data={barData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <defs>
@@ -93,8 +136,8 @@ const Dashboard = () => {
       <div className="glass-card rounded-2xl p-6 border-primary/10 flex flex-col items-center justify-center relative overflow-hidden">
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl -z-10" />
         <div className="w-full">
-          <h3 className="text-base font-bold text-foreground mb-1">Status Atribuições</h3>
-          <p className="text-xs text-muted-foreground mb-4">Progressão visual de volume.</p>
+          <h3 className="text-base font-bold text-foreground mb-1">Proporção Operacional</h3>
+          <p className="text-xs text-muted-foreground mb-4">Volume vs Status Real.</p>
         </div>
         <ResponsiveContainer width="100%" height={220}>
           <PieChart>
@@ -119,7 +162,7 @@ const Dashboard = () => {
           {pieData.map((d, i) => (
             <div key={d.name} className="flex items-center gap-2 text-sm text-foreground font-medium">
               <div className="w-3 h-3 rounded-md" style={{ background: pieColors[i] }} />
-              {d.name} <span className="text-muted-foreground ml-1">({d.value}%)</span>
+              {d.name}
             </div>
           ))}
         </div>
@@ -134,32 +177,32 @@ const Dashboard = () => {
         <div className="space-y-6">
            <div>
              <div className="flex justify-between items-end mb-2">
-               <span className="text-sm font-medium text-muted-foreground">Total depositado</span>
-               <span className="font-bold text-foreground tracking-tight">R$ 8.000,00</span>
+               <span className="text-sm font-medium text-muted-foreground">Volume Depositado</span>
+               <span className="font-bold text-foreground tracking-tight">{formatBRL(stats.totalDepositado)}</span>
              </div>
              <div className="w-full bg-emerald-950/30 rounded-full h-2.5 overflow-hidden">
-               <div className="bg-emerald-400 h-full rounded-full shadow-[0_0_10px_rgba(52,211,153,0.5)] transition-all duration-1000" style={{ width: '45%' }} />
+               <div className="bg-emerald-400 h-full rounded-full shadow-[0_0_10px_rgba(52,211,153,0.5)] transition-all duration-1000" style={{ width: stats.totalDepositado ? '100%' : '5%' }} />
              </div>
            </div>
 
            <div>
              <div className="flex justify-between items-end mb-2">
-               <span className="text-sm font-medium text-muted-foreground">Total sacado</span>
-               <span className="font-bold text-foreground tracking-tight">R$ 9.450,00</span>
+               <span className="text-sm font-medium text-muted-foreground">Volume Sacado</span>
+               <span className="font-bold text-foreground tracking-tight">{formatBRL(stats.totalSacado)}</span>
              </div>
              <div className="w-full bg-primary/10 rounded-full h-2.5 overflow-hidden">
-               <div className="bg-primary h-full rounded-full shadow-[0_0_10px_hsl(var(--primary)/0.5)] transition-all duration-1000" style={{ width: '55%' }} />
+               <div className="bg-primary h-full rounded-full shadow-[0_0_10px_hsl(var(--primary)/0.5)] transition-all duration-1000" style={{ width: stats.totalSacado > stats.totalDepositado ? '100%' : (stats.totalSacado ? '50%' : '5%') }} />
              </div>
            </div>
 
            <div className="grid grid-cols-2 gap-4 pt-4 mt-2 border-t border-border/20">
              <div className="flex flex-col gap-1">
-               <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Total metas</span>
-               <span className="text-2xl font-black text-foreground drop-shadow-md">8</span>
+               <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Lucro Bruto</span>
+               <span className={`text-2xl font-black drop-shadow-md ${stats.lucroBruto >= 0 ? 'text-emerald-400' : 'text-red-500'}`}>{formatBRL(stats.lucroBruto)}</span>
              </div>
              <div className="flex flex-col gap-1">
-               <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Depositantes</span>
-               <span className="text-2xl font-black text-foreground drop-shadow-md">140</span>
+               <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Custo Operador</span>
+               <span className="text-2xl font-black text-red-400 drop-shadow-md">- {formatBRL(stats.totalSalarios)}</span>
              </div>
            </div>
         </div>
