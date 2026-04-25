@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Target, Plus, X, Search, ArrowUpRight, ArrowLeft, AlertTriangle, CheckSquare, Trash2, RotateCcw, BarChart2 } from 'lucide-react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { pushNotify, requestNotificationPermission } from '../lib/notifications';
@@ -528,8 +529,8 @@ const Tasks = () => {
         </div>
       )}
 
-      {/* MODAL - Nova Operação (Full Screen Takeover) */}
-      {isModalOpen && (
+      {/* MODAL - Nova Operação (Full Screen Takeover via Portal) */}
+      {isModalOpen && createPortal(
         <div
           className="fixed inset-0 bg-background flex flex-col"
           style={{ zIndex: 9999 }}
@@ -619,10 +620,11 @@ const Tasks = () => {
               </button>
 
               {/* Bottom safe area spacer */}
-              <div style={{ height: `calc(env(safe-area-inset-bottom) + 20px)` }} />
+              <div style={{ height: `calc(env(safe-area-inset-bottom) + 80px)` }} />
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
