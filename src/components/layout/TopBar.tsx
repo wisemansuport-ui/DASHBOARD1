@@ -57,10 +57,21 @@ export const TopBar = () => {
           {showNotifs && (
             <div className="absolute right-0 top-11 w-80 bg-popover border border-border rounded-xl shadow-2xl overflow-hidden animate-fade-in">
               <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-                <span className="text-sm font-semibold text-foreground">Notificações</span>
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm font-semibold text-foreground">Notificações</span>
+                  <button 
+                    onClick={() => {
+                        import("react-onesignal").then((m) => m.default.Slidedown.promptPush());
+                    }} 
+                    className="text-[10px] font-bold text-primary flex items-center gap-1 hover:underline"
+                    title="Receba alertas com o داش board fechado"
+                  >
+                    🔔 Ativar Alertas no Dispositivo
+                  </button>
+                </div>
                 {unreadCount > 0 && (
-                  <button onClick={markAllRead} className="text-xs text-primary hover:underline">
-                    Marcar todas como lidas
+                  <button onClick={markAllRead} className="text-xs text-muted-foreground hover:text-foreground">
+                    Marcar lidas
                   </button>
                 )}
               </div>

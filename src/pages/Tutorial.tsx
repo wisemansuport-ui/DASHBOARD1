@@ -3,8 +3,8 @@ import { Bell, Info } from 'lucide-react';
 
 const Tutorial = () => {
   return (
-    <div className="space-y-6 animate-fade-in w-full max-w-4xl pb-12">
-      <div className="glass-card rounded-2xl p-6 md:p-10 border-primary/20 shadow-[0_0_40px_hsl(var(--primary)/0.03)]">
+    <div className="space-y-6 animate-fade-in w-full max-w-4xl mx-auto pb-12 mt-12">
+      <div className="glass-card rounded-2xl p-6 md:p-10 border-primary/20 shadow-[0_0_40px_hsl(var(--primary)/0.03)] mx-auto">
         <div className="flex items-center gap-5 mb-8">
           <div className="w-14 h-14 rounded-xl border border-primary/50 flex items-center justify-center bg-primary/10 text-primary shadow-inner">
             <Bell className="w-7 h-7" />
@@ -16,12 +16,12 @@ const Tutorial = () => {
         </div>
 
         <p className="text-[15px] font-medium text-muted-foreground mb-8 leading-relaxed max-w-3xl">
-          Para receber notificacoes no celular, instale o Nytzer Control como app na tela inicial do seu aparelho. Depois, ao abrir o app, permita as notificacoes quando o sistema solicitar.
+          Para receber notificacoes no celular, instale o NytzerVision como app na tela inicial do seu aparelho. Depois, ao abrir o app, permita as notificacoes quando o sistema solicitar.
         </p>
 
         <div className="space-y-3">
           {[
-            "Abra o Nytzer Control no navegador do celular",
+            "Abra o NytzerVision no navegador do celular",
             "Toque no menu do navegador e selecione \"Adicionar a tela inicial\"",
             "Abra o app instalado na sua tela inicial",
             "Permita as notificacoes quando o aviso aparecer",

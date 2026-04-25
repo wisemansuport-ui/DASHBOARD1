@@ -23,6 +23,7 @@ export interface OperationMeta {
   titulo: string;
   contas: number;
   modelo: string;
+  totalApv?: number;
   createdAt: string;
   status?: 'ativa' | 'fechada' | 'lixeira';
   remessas?: Remessa[];
@@ -341,7 +342,8 @@ const Tasks = () => {
   const [rede, setRede] = useState('Selecione');
   const [titulo, setTitulo] = useState('');
   const [contas, setContas] = useState<number | ''>('');
-  const [modelo, setModelo] = useState<'Salario + Bau' | 'Apenas Bau'>('Salario + Bau');
+  const [totalApv, setTotalApv] = useState<number | ''>('');
+  const [modelo, setModelo] = useState<'Depositante' | 'Recarga'>('Depositante');
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -349,6 +351,7 @@ const Tasks = () => {
     const newMeta: OperationMeta = {
       id: Date.now().toString(),
       plataforma, rede, titulo, contas: Number(contas), modelo, 
+      totalApv: totalApv ? Number(totalApv) : undefined,
       createdAt: new Date().toISOString(),
       status: 'ativa',
       remessas: []
@@ -362,7 +365,7 @@ const Tasks = () => {
       `O operador iniciou a meta "${titulo}" (${contas} contas) na plataforma ${plataforma} / ${rede}.`
     );
 
-    setPlataforma(''); setRede('Selecione'); setTitulo(''); setContas('');
+    setPlataforma(''); setRede('Selecione'); setTitulo(''); setContas(''); setTotalApv('');
   };
 
   const onUpdateMeta = (updatedMeta: OperationMeta) => {
@@ -538,7 +541,7 @@ const Tasks = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase">Plataforma *</label>
-                  <input type="text" value={plataforma} onChange={e => setPlataforma(e.target.value)} placeholder="Agência Principal" className="w-full bg-background border border-border/50 rounded-lg px-4 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-inner" required />
+                  <input type="text" value={plataforma} onChange={e => setPlataforma(e.target.value)} placeholder="Ex. Scorpionpg" className="w-full bg-background border border-border/50 rounded-lg px-4 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-inner" required />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase">Rede *</label>
@@ -549,13 +552,17 @@ const Tasks = () => {
               </div>
 
               <div className="grid grid-cols-3 gap-4">
-                <div className="col-span-2 space-y-2">
+                <div className="space-y-2">
                   <label className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase">Titulo *</label>
-                  <input type="text" value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Ex: Meta Abril" className="w-full bg-background border border-border/50 rounded-lg px-4 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-inner" required />
+                  <input type="text" value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Ex. Media 80 3,5x" className="w-full bg-background border border-border/50 rounded-lg px-4 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-inner" required />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase">Contas</label>
-                  <input type="number" value={contas} onChange={e => setContas(e.target.value ? Number(e.target.value) : '')} className="w-full bg-background border border-border/50 rounded-lg px-4 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-inner text-center font-bold" min="1" required />
+                  <input type="number" value={contas} onChange={e => setContas(e.target.value ? Number(e.target.value) : '')} placeholder="Ex. 70" className="w-full bg-background border border-border/50 rounded-lg px-4 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-inner font-bold" min="1" required />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase">Total AP.V</label>
+                  <input type="number" value={totalApv} onChange={e => setTotalApv(e.target.value ? Number(e.target.value) : '')} placeholder="Ex. 20.000" className="w-full bg-background border border-border/50 rounded-lg px-4 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-inner font-bold" min="0" />
                 </div>
               </div>
 
@@ -573,7 +580,7 @@ const Tasks = () => {
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase">Modelo da Meta</label>
                 <div className="grid grid-cols-2 gap-2">
-                  {['Salario + Bau', 'Apenas Bau'].map((mod: any) => (
+                  {['Depositante', 'Recarga'].map((mod: any) => (
                     <button key={mod} type="button" onClick={() => setModelo(mod)} className={`py-3 rounded-lg text-sm font-bold transition-all border ${modelo === mod ? 'bg-primary/10 border-primary text-primary shadow-[0_0_15px_hsl(var(--primary)/0.15)]' : 'bg-muted/30 border-border/50 text-muted-foreground hover:bg-muted/50 hover:text-foreground'}`}>
                       {mod}
                     </button>

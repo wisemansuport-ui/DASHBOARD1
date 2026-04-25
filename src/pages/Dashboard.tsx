@@ -1,5 +1,5 @@
 import { KPICard } from "@/components/dashboard/KPICard";
-import { DollarSign, Target, Activity, Users, CalendarDays, ListTodo, ShieldCheck, Wrench, BarChart3, Globe, ChartNoAxesCombined, CreditCard } from "lucide-react";
+import { DollarSign, Target, Activity, Users, CalendarDays, ListTodo, ShieldCheck, Wrench, BarChart3, Globe, ChartNoAxesCombined, CreditCard, PlayCircle } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell } from "recharts";
 import { Link } from "react-router-dom";
 import { useLocalStorage } from "../hooks/useLocalStorage";
@@ -32,8 +32,6 @@ const pieColors = ["hsl(var(--primary))", "hsl(var(--primary) / 0.4)", "hsl(var(
 const quickLinks = [
   { path: "/production", label: "Planilhas", icon: ChartNoAxesCombined, desc: "Cronograma", roles: ['ADMIN', 'OPERADOR'] },
   { path: "/tasks", label: "Tarefas", icon: CalendarDays, desc: "Gestão", roles: ['ADMIN', 'OPERADOR'] },
-  { path: "/networks", label: "Redes", icon: Globe, desc: "Performance", roles: ['ADMIN'] },
-  { path: "/quality", label: "Qualidade", icon: ShieldCheck, desc: "Auditoria", roles: ['ADMIN'] },
   { path: "/reports", label: "Relatórios", icon: BarChart3, desc: "Avançado", roles: ['ADMIN'] },
   { path: "/pix", label: "Chaves PIX", icon: CreditCard, desc: "Financeiro", roles: ['ADMIN', 'OPERADOR'] },
 ];
@@ -214,15 +212,17 @@ const Dashboard = () => {
     </div>
 
     <div>
-      <h3 className="text-sm font-bold text-foreground mb-3 tracking-wide uppercase">Comandos Rápidos</h3>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      <h3 className="text-sm font-bold text-foreground mb-4 tracking-wide uppercase">Comandos Rápidos</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {allowedLinks.map(({ path, label, icon: Icon, desc }) => (
-          <Link key={path} to={path} className="glass-card rounded-xl p-4 hover:bg-primary/5 border border-transparent hover:border-primary/30 transition-all duration-300 group text-center flex flex-col items-center justify-center h-full">
-            <div className="p-3 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors mb-3">
-              <Icon className="w-5 h-5 text-primary group-hover:scale-110 transition-transform shadow-sm" />
+          <Link key={path} to={path} className="flex items-center gap-4 p-4 rounded-[12px] border border-border/30 bg-background/40 hover:bg-muted/20 transition-all group shadow-sm">
+            <div className="w-10 h-10 rounded-md shrink-0 bg-primary/5 border border-primary/20 flex items-center justify-center group-hover:bg-primary/20 group-hover:border-primary/50 transition-colors">
+              <Icon className="w-5 h-5 text-primary" />
             </div>
-            <p className="text-sm font-semibold text-foreground">{label}</p>
-            <p className="text-[10px] text-muted-foreground mt-1 line-clamp-1">{desc}</p>
+            <div className="text-left">
+              <p className="text-[14px] font-bold text-foreground/90">{label}</p>
+              <p className="text-[11px] font-medium text-muted-foreground mt-0.5">{desc}</p>
+            </div>
           </Link>
         ))}
       </div>
