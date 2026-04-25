@@ -55,7 +55,7 @@ export const TopBar = () => {
           </button>
 
           {showNotifs && (
-            <div className="absolute right-0 top-11 w-80 bg-popover border border-border rounded-xl shadow-2xl overflow-hidden animate-fade-in">
+            <div className="absolute -right-14 sm:-right-4 md:right-0 top-11 w-[300px] sm:w-80 bg-popover border border-border rounded-xl shadow-2xl overflow-hidden animate-fade-in z-50">
               <div className="flex items-center justify-between px-4 py-3 border-b border-border">
                 <div className="flex flex-col gap-1">
                   <span className="text-sm font-semibold text-foreground">Notificações</span>
